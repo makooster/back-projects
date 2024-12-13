@@ -23,15 +23,18 @@ This is a simple to-do list application with a back-end API built using **FastAP
    cd todo-list-api
 
 2. Create a virtual environment and activate it
-    ```bash python -m venv venv
+    ```bash 
+    python -m venv venv
     source venv/bin/activate  # On Windows: venv\Scripts\activate
 
 3. Install dependencies
-    ```bash python -m venv venv
+    ```bash 
+    python -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 
 4. Run the server
-    ```bash uvicorn main:app --reload
+    ```bash
+     uvicorn main:app --reload
 
 5. Open the app
 - API Documentation: http://127.0.0.1:8000/docs
