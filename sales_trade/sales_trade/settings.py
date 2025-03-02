@@ -37,7 +37,13 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
+    'rest_framework_simplejwt',
+    'drf_yasg',
     'sales',
+    'products',
+    'trading',
+    'users',
 ]
 
 MIDDLEWARE = [
@@ -50,12 +56,20 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'sales_trade.urls'
+CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+
+#may be i need to delete it afterwards
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+
+# Use a custom user model
+AUTH_USER_MODEL = "users.User"
 
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / "templates"],  
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -68,6 +82,27 @@ TEMPLATES = [
     },
 ]
 
+
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+    ),
+    "DEFAULT_PERMISSION_CLASSES": (
+        "rest_framework.permissions.IsAuthenticated",
+    ),
+    "DEFAULT_SCHEMA_CLASS": "drf_yasg.openapi.AutoSchema",
+}
+
+from datetime import timedelta
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=1),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
+    "AUTH_HEADER_TYPES": ("Bearer",),
+}
+
+
+ROOT_URLCONF = 'sales_trade.urls'
+
 WSGI_APPLICATION = 'sales_trade.wsgi.application'
 
 
@@ -76,8 +111,12 @@ WSGI_APPLICATION = 'sales_trade.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'sales_trades_db',  
+        'USER': 'postgres',  
+        'PASSWORD': 'P5assword',  
+        'HOST': 'localhost',  
+        'PORT': '5432',  
     }
 }
 
