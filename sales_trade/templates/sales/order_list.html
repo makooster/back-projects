@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Sales Orders</h2>
+<table>
+    <tr>
+        <th>ID</th>
+        <th>Trader</th>
+        <th>Product</th>
+        <th>Quantity</th>
+        <th>Status</th>
+    </tr>
+    {% for order in orders %}
+    <tr>
+        <td>{{ order.id }}</td>
+        <td>{{ order.trader.username }}</td>
+        <td>{{ order.product.name }}</td>
+        <td>{{ order.quantity }}</td>
+        <td>{{ order.status }}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

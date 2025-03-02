@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Trading Orders</h2>
+<table>
+    <tr>
+        <th>ID</th>
+        <th>Trader</th>
+        <th>Product</th>
+        <th>Type</th>
+        <th>Quantity</th>
+        <th>Price</th>
+        <th>Status</th>
+    </tr>
+    {% for order in orders %}
+    <tr>
+        <td>{{ order.id }}</td>
+        <td>{{ order.trader.username }}</td>
+        <td>{{ order.product.name }}</td>
+        <td>{{ order.get_order_type_display }}</td>
+        <td>{{ order.quantity }}</td>
+        <td>${{ order.price }}</td>
+        <td>{{ order.get_status_display }}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Order Details</h2>
+<p><strong>ID:</strong> {{ order.id }}</p>
+<p><strong>Trader:</strong> {{ order.trader.username }}</p>
+<p><strong>Product:</strong> {{ order.product.name }}</p>
+<p><strong>Order Type:</strong> {{ order.get_order_type_display }}</p>
+<p><strong>Quantity:</strong> {{ order.quantity }}</p>
+<p><strong>Price:</strong> ${{ order.price }}</p>
+<p><strong>Status:</strong> {{ order.get_status_display }}</p>
+
+{% if order.status == "pending" %}
+    <form action="{% url 'cancel_order' order.id %}" method="POST">
+        {% csrf_token %}
+        <button type="submit">Cancel Order</button>
+    </form>
+{% endif %}
+
+{% endblock %}
