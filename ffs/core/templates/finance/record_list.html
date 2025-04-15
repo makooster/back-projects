@@ -1,0 +1,135 @@
+{% extends "finance/base.html" %}
+
+{% block title %}Список записей{% endblock %}
+  <head>
+    <style>
+      .btn {
+          display: inline-block;
+          padding: 3px 6px;
+          margin-left: 5px;
+          font-size: 0.8em;
+          text-decoration: none;
+          border-radius: 4px;
+      }
+  
+      .btn-outline-primary {
+          color: #007bff;
+          border: 1px solid #007bff;
+      }
+  
+      .btn-outline-danger {
+          color: #dc3545;
+          border: 1px solid #dc3545;
+      }
+  
+      .btn:hover {
+          background-color: #f0f0f0;
+      }
+
+      table {
+        border-collapse: collapse;
+        width: 100%;
+        font-size: 0.95em;
+      }
+
+      th, td {
+          padding: 8px 12px;
+          border: 1px solid #ccc;
+      }
+
+      th {
+          background-color: #f8f9fa;
+          text-align: left;
+      }
+
+      tr:nth-child(even) {
+          background-color: #f2f2f2;
+      }
+  </style>
+  
+  </head>
+    {% block content %}
+    <h2>Список финансовых записей</h2>
+
+    <form method="get">
+        <label for="type">Тип:</label>
+        <select name="type" id="type">
+          <option value="">Все</option>
+          <option value="REPLENISHMENT" {% if request.GET.type == "REPLENISHMENT" %}selected{% endif %}>Пополнение</option>
+          <option value="WITHDRAW" {% if request.GET.type == "WITHDRAW" %}selected{% endif %}>Снятие</option>
+        </select>
+    
+        <label for="status">Статус:</label>
+        <select name="status" id="status">
+          <option value="">Все</option>
+          {% for value, display in statuses %}
+            <option value="{{ value }}" {% if request.GET.status == value %}selected{% endif %}>{{ display }}</option>
+          {% endfor %}
+        </select>
+    
+        <label for="category">Категория:</label>
+        <select name="category" id="category">
+          <option value="">Все</option>
+          {% for cat in categories %}
+            <option value="{{ cat.id }}" {% if request.GET.category == cat.id|stringformat:"s" %}selected{% endif %}>
+              {{ cat.name }}
+            </option>
+          {% endfor %}
+        </select>
+    
+        <label for="subcategory">Подкатегория:</label>
+        <select name="subcategory" id="subcategory">
+          <option value="">Все</option>
+          {% for sub in subcategories %}
+            <option value="{{ sub.id }}" {% if request.GET.subcategory == sub.id|stringformat:"s" %}selected{% endif %}>
+              {{ sub.name }}
+            </option>
+          {% endfor %}
+        </select>
+    
+        <label for="start_date">С даты:</label>
+        <input type="date" name="start_date" id="start_date" value="{{ request.GET.start_date }}">
+    
+        <label for="end_date">По дату:</label>
+        <input type="date" name="end_date" id="end_date" value="{{ request.GET.end_date }}">
+    
+        <button type="submit">Фильтровать</button>
+        <a href="{% url 'record-list' %}">Сбросить</a>
+    </form>
+    
+
+    {% if records %}
+    <table border="1" cellspacing="0" cellpadding="6" style="margin-top: 20px; border-collapse: collapse; width: 100%;">
+      <thead>
+          <tr>
+              <th>Тип</th>
+              <th>Категория</th>
+              <th>Сумма</th>
+              <th>Дата</th>
+              <th>Действия</th>
+          </tr>
+      </thead>
+      <tbody>
+          {% for record in records %}
+          <tr>
+              <td>{{ record.get_type_display }}</td>
+              <td>{{ record.subcategory }}</td>
+              <td>{{ record.formatted_sum }}</td>
+              <td>{{ record.date|date:"d.m.Y" }}</td>
+              <td>
+                  <a href="{% url 'record-edit' record.id %}" class="btn btn-outline-primary">✏️</a>
+                  <a href="{% url 'record-delete' record.id %}" class="btn btn-outline-danger"
+                     onclick="return confirm('Вы уверены, что хотите удалить эту запись?');">🗑️</a>
+              </td>
+          </tr>
+          {% endfor %}
+      </tbody>
+  </table>
+  
+      
+    {% else %}
+        <p>Нет финансовых записей</p>
+    {% endif %}
+
+    {% endblock %}
+
