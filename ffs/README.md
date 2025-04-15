@@ -58,8 +58,8 @@ ffs/
 
 1. **Клонируйте репозиторий**
 ```bash
-git clone https://github.com/makoster/finance-tracker.git
-cd finance-tracker
+git clone https://github.com/makooster/back-projects/tree/main/ffs
+cd ffs
 ```
 
 2. **Создайте виртуальное окружение**
