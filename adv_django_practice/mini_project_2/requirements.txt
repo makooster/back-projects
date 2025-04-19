@@ -1,0 +1,12 @@
+# Django==5.1.5
+python-dotenv
+pymysql
+nltk
+spacy
+pyresparser
+pdfminer.six
+pafy
+youtube_dl
+plotly
+pandas
+python-dateutil
