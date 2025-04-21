@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -37,11 +38,22 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    # Third-party apps
+    'rest_framework',
+    'rest_framework_simplejwt',
+    'corsheaders',
+    'drf_yasg',
+    'djongo',
+    # Project apps
+    'user_management',
+    'resume_analysis',
+    'job_matching',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware', 
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -54,7 +66,7 @@ ROOT_URLCONF = 'mini_project_2.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],  # Added templates dir
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -65,7 +77,7 @@ TEMPLATES = [
             ],
         },
     },
-]
+] 
 
 WSGI_APPLICATION = 'mini_project_2.wsgi.application'
 
@@ -73,38 +85,69 @@ WSGI_APPLICATION = 'mini_project_2.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
+from dotenv import load_dotenv
+from pymongo import MongoClient
+
+load_dotenv()
+   
+MONGO_URI = os.getenv('MONGO_URI')
+
+
 DATABASES = {
     'default': {
-        'ENGINE'  : 'django.db.backends.postgresql',
-        'NAME'    : 'resume_project',
-        'USER'    : 'postgres',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'resume_project',
+        'USER': 'postgres',
         'PASSWORD': 'P5assword',
-        'HOST'    : 'localhost', 
-        'PORT'    : '5432',
-    },
-    'mongodb': {
-        'ENGINE': 'pymongo',
-        'NAME': 'resume_analyzer',
-        'CLIENT': {
-            'host': 'mongodb+srv://magzhan1501:zfb7mZDFZjSPlGFZ@makosterdb.avotgah.mongodb.net/resume_analyzer?retryWrites=true&w=majority&appName=makosterDB',
-            'username': 'magzhan1501',
-            'password': 'zfb7mZDFZjSPlGFZ',
-            'authSource': 'admin',
-            'authMechanism': 'SCRAM-SHA-1',
-        }
+        'HOST': 'localhost', 
+        'PORT': '5432',
     },
     'user_logs': {
-        'ENGINE'  : 'django.db.backends.mysql',
-        'NAME'    : 'user_logs',
-        'USER'    : 'mako',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'user_logs',
+        'USER': 'mako',
         'PASSWORD': 'P5assword',
-        'HOST'    : 'localhost', 
-        'PORT'    : '3306',
+        'HOST': 'localhost', 
+        'PORT': '3306',
     }
 }
 
-DATABASE_ROUTERS = ['mini_project_2.db_routers.MultiDBRouter']
+DATABASE_ROUTERS = ['db_routers.MultiDBRouter']
 
+# REST Framework settings
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+    'DEFAULT_THROTTLE_CLASSES': [
+        'rest_framework.throttling.AnonRateThrottle',
+        'rest_framework.throttling.UserRateThrottle'
+    ],
+    'DEFAULT_THROTTLE_RATES': {
+        'anon': '100/day',
+        'user': '1000/day'
+    }
+}
+
+# JWT settings
+from datetime import timedelta
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(hours=1),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+}
+
+# CORS settings
+CORS_ALLOW_ALL_ORIGINS = True  # For development only, restrict in production
+
+# Celery settings
+CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
@@ -124,6 +167,12 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+# Custom user model
+AUTH_USER_MODEL = 'user_management.User'
+
+# Media files for resume uploads
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
@@ -141,8 +190,12 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = 'static/'
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Email configuration
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  

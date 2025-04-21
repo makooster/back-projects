@@ -9,9 +9,7 @@ class MultiDBRouter:
         """
         Point all read operations to the specific database based on the model's app label.
         """
-        if model._meta.app_label == 'resume_analysis':
-            return 'mongodb'
-        elif model._meta.app_label == 'user_activity':
+        if model._meta.app_label == 'user_activity':
             return 'user_logs'
         return 'default'
 
@@ -19,9 +17,7 @@ class MultiDBRouter:
         """
         Point all write operations to the specific database based on the model's app label.
         """
-        if model._meta.app_label == 'resume_analysis':
-            return 'mongodb'
-        elif model._meta.app_label == 'user_activity':
+        if model._meta.app_label == 'user_activity':
             return 'user_logs'
         return 'default'
 
@@ -37,10 +33,8 @@ class MultiDBRouter:
 
     def allow_migrate(self, db, app_label, model_name=None, **hints):
         """
-        Make sure the auth and contenttypes apps only appear in the 'default' database.
+        Only migrate models in 'user_activity' to 'user_logs'; others to 'default'.
         """
-        if app_label == 'resume_analysis':
-            return db == 'mongodb'
-        elif app_label == 'user_activity':
+        if app_label == 'user_activity':
             return db == 'user_logs'
         return db == 'default'
